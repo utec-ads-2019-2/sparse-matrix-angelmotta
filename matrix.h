@@ -2,6 +2,8 @@
 #define SPARSE_MATRIX_MATRIX_H
 
 #include <stdexcept>
+#include <vector>
+#include "node.h"
 
 using namespace std;
 
@@ -10,8 +12,21 @@ class Matrix {
 private:
     Node<T> *root;
     unsigned rows, columns;
+    vector<Node<T>*> vec_cols;
+    vector<Node<T>*> vec_rows;
+
+    void push_front(Node<T>* head, Node<T>* node_ptr) {
+        if(head == nullptr){
+            head = node_ptr;
+        }
+        else{
+            node_ptr->next = head;
+            head = node_ptr;
+        }
+    }
 
 public:
+    /*
     Matrix(unsigned rows, unsigned columns);
 
     void set(unsigned, unsigned, T);
@@ -24,6 +39,66 @@ public:
     void print() const;
 
     ~Matrix();
+     */
+    Matrix(unsigned _rows, unsigned _cols) : rows(_rows), columns(_cols) {
+        vec_rows.reserve(rows);
+        for(int i=0; i<rows; ++i){
+            Node<T>* head = nullptr;
+            vec_rows.push_back(head);
+        }
+        vec_cols.reserve(rows);
+        for(int j=0; j<columns; ++j){
+            Node<T>* head = nullptr;
+            vec_cols.push_back(head);
+        }
+    }
+
+    void set(unsigned x, unsigned y, T value){
+        Node<T>* node_ptr = new Node<T>(x,y,value);
+        if(vec_rows[x] == nullptr){
+            vec_rows[x] = node_ptr;
+            //push_front(head_row, node_ptr);
+        }
+        if(vec_cols[y] == nullptr){
+            vec_cols[y] = node_ptr;
+        }
+    }
+
+    void print(){
+        for(int i=0; i<rows; ++i){
+            for(int j=0; j<columns; ++j){
+                bool found = 0;
+                if(vec_cols[j] == nullptr) cout << "0 ";
+                else{ // run vertically over the list
+                    Node<T>* actual = vec_cols[j];
+                    while(actual != nullptr){
+                        if(actual->row == i){
+                            found = 1;
+                            cout << actual->data << " ";
+                            break;
+                        }
+                        if(actual->row > i){    // avoid unuseful iterations
+                            break;
+                        }
+                        actual = actual->down;
+                    }
+                    if(!found) cout << "0 ";
+                }
+            }
+            cout << '\n';
+        }
+        cout << '\n';
+    }
+
+    ~Matrix(){
+        cout << "Destructor Matrix Sparse" << '\n';
+        for(int i=0; i<rows; ++i){
+            if(vec_rows[i] != nullptr){
+                cout << "Kill en fila: " << i << '\n';
+                vec_rows[i]->killSelf();
+            }
+        }
+    }
 };
 
 #endif //SPARSE_MATRIX_MATRIX_H
