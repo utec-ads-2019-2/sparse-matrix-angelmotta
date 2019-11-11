@@ -15,13 +15,13 @@ private:
     vector<Node<T>*> vec_cols;
     vector<Node<T>*> vec_rows;
 
-    void push_front(Node<T>* head, Node<T>* node_ptr) {
-        if(head == nullptr){
-            head = node_ptr;
+    void push_front(Node<T>** head, Node<T>** node_ptr) {
+        if(*head == nullptr){
+            *head = *node_ptr;
         }
         else{
-            node_ptr->next = head;
-            head = node_ptr;
+            (*node_ptr)->next = *head;
+            *head = *node_ptr;
         }
     }
 
@@ -55,12 +55,32 @@ public:
 
     void set(unsigned x, unsigned y, T value){
         Node<T>* node_ptr = new Node<T>(x,y,value);
+        // Update linked list for row x
         if(vec_rows[x] == nullptr){
             vec_rows[x] = node_ptr;
-            //push_front(head_row, node_ptr);
+            //push_front(&vec_rows[x], &node_ptr);
+        }
+        else{
+            auto current = vec_rows[x];
+            Node<T>* node_prev = nullptr;
+            while(y > current->col){
+                if(current->next){
+                    node_prev = current;
+                    current = current->next;   // if next is different to nullptr go for the next
+                }
+                else break;
+            }
+            if(!node_prev){ // if new node should be the new head
+                push_front(&vec_rows[x], &node_ptr);
+            }
+            else{
+                node_prev->next = node_ptr;
+                node_ptr->next = current;
+            }
         }
         if(vec_cols[y] == nullptr){
             vec_cols[y] = node_ptr;
+            //push_front(&vec_cols[y], &node_ptr);
         }
     }
 
