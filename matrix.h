@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <iomanip>
 #include "node.h"
 
 using namespace std;
@@ -49,7 +50,6 @@ public:
         Node<T>* node_prev = nullptr;
         Node<T>* current = nullptr;
         bool done = 0;
-        //bool update_operation = 0;
         // Update linked list for row x
         if(vec_rows[x] == nullptr){     // if linked list is empty
             node_ptr = new Node<T>(x,y,value);
@@ -62,9 +62,6 @@ public:
                 if(current->col == y){
                     cout << "update existing node \n";
                     current->data = value;
-                    done = 1;
-                    //update_operation = 1;
-                    //break;
                     return;
                 }
                 else if(y > current->col){
@@ -97,7 +94,6 @@ public:
             }
         }
         // Update Pointers for vertical linked list - column y
-        //if(update_operation) return;    // It's Not needed update something
         done = 0;
         node_prev = nullptr;
         current = nullptr;
@@ -159,9 +155,8 @@ public:
         return 0;
     }
 
-    Matrix<T> operator*(T scalar) const{
+    Matrix<T> operator*(T scalar) const{    // Multiplication by scalar
         Matrix<T> result(rows, columns);
-        cout << "Multiplication by scalar \n";
         //cout << (*this).operator()(0,1) << "\n";
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
@@ -176,13 +171,13 @@ public:
         for(int i=0; i<rows; ++i){
             for(int j=0; j<columns; ++j){
                 bool found = 0;
-                if(vec_cols[j] == nullptr) cout << "0 ";
+                if(vec_cols[j] == nullptr) cout << setw(4) << "0";
                 else{ // run vertically over the list
                     Node<T>* actual = vec_cols[j];
                     while(actual){
                         if(actual->row == i){
                             found = 1;
-                            cout << actual->data << " ";
+                            cout << setw(4) << actual->data;
                             break;
                         }
                         if(actual->row > i){    // avoid unuseful iterations
@@ -190,7 +185,7 @@ public:
                         }
                         actual = actual->down;      // go down over the list
                     }
-                    if(!found) cout << "0 ";
+                    if(!found) cout << setw(4) << "0";
                 }
             }
             cout << '\n';
@@ -212,7 +207,7 @@ public:
         cout << "Destructor Matrix Sparse" << '\n';
         for(int i=0; i<rows; ++i){
             if(vec_rows[i] != nullptr){
-                cout << "Kill en fila: " << i << '\n';
+                //cout << "Kill en fila: " << i << '\n';
                 vec_rows[i]->killSelf();
             }
         }
