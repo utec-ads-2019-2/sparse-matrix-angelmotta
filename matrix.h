@@ -15,16 +15,6 @@ private:
     vector<Node<T>*> vec_cols;
     vector<Node<T>*> vec_rows;
 
-    void push_front(Node<T>** head, Node<T>** node_ptr) {
-        if(*head == nullptr){
-            *head = *node_ptr;
-        }
-        else{
-            (*node_ptr)->next = *head;
-            *head = *node_ptr;
-        }
-    }
-
 public:
     /*
     Matrix(unsigned rows, unsigned columns);
@@ -54,35 +44,112 @@ public:
     }
 
     void set(unsigned x, unsigned y, T value){
-        Node<T>* node_ptr = new Node<T>(x,y,value);
+        //Node<T>* node_ptr = new Node<T>(x,y,value);
+        Node<T>* node_prev = nullptr;
+        Node<T>* current = nullptr;
+        bool done = 0;
         // Update linked list for row x
-        if(vec_rows[x] == nullptr){
+        if(vec_rows[x] == nullptr){     // if linked list is empty
+            Node<T>* node_ptr = new Node<T>(x,y,value);
             vec_rows[x] = node_ptr;
-            //push_front(&vec_rows[x], &node_ptr);
         }
-        else{
-            auto current = vec_rows[x];
-            Node<T>* node_prev = nullptr;
-            while(y > current->col){
-                if(current->next){
+        else{ // if exist at least one node in the row
+            current = vec_rows[x];      // first time current is head
+            // new logic
+            while(current){
+                if(current->col == y){
+                    cout << "update existing node \n";
+                    current->data = value;
+                    done = 1;
+                    break;
+                }
+                else if(y > current->col){
                     node_prev = current;
-                    current = current->next;   // if next is different to nullptr go for the next
+                    current = current->next;
+                }
+                else{  // new node should be a column before the current
+                    Node<T>* node_ptr = new Node<T>(x,y,value);
+                    if(!node_prev){
+                        cout << "before the first filled col\n";
+                        node_ptr->next = current;
+                        current = node_ptr;
+                        done = 1;
+                        break;
+                    }
+                    else { // so new node should be between 2 other nodes in that row
+                        cout << "between other 2 nodes \n";
+                        auto bkp_node_prev_next = node_prev->next;
+                        node_prev->next = node_ptr;
+                        node_ptr->next = bkp_node_prev_next;
+                        done = 1;
+                        break;
+                    }
+                }
+            }
+            if(!done){
+                cout << "go to the last position..push_back \n";
+                Node<T>* node_ptr = new Node<T>(x,y,value);
+                if(node_prev && y > node_prev->col) node_prev->next = node_ptr;
+            }
+        }
+        // Update linked list for column y
+        done = 0;
+        Node<T>* node_ptr = new Node<T>(x,y,value);
+        node_prev = nullptr;
+        current = nullptr;
+        if(vec_cols[y] == nullptr){  // if head is nullptr
+            vec_cols[y] = node_ptr;
+        }
+        else{  // update existing linked list for column y
+            current = vec_cols[y];
+            while(x > current->row){
+                if(current->down){  // if exist the next node so go down for the next
+                    node_prev = current;
+                    current = current->down;
                 }
                 else break;
             }
-            if(!node_prev){ // if new node should be the new head
-                push_front(&vec_rows[x], &node_ptr);
+            if(!node_prev){  // if only exist one node in the linked list
+                if(x > current->row){
+                    current->down = node_ptr;  // push_back_down
+                }
+                else{  // push_front_down
+                    node_ptr->down = vec_cols[y];   // node_ptr->next = head
+                    vec_cols[y] = node_ptr;
+                }
             }
-            else{
-                node_prev->next = node_ptr;
-                node_ptr->next = current;
+            else{   // if exist at least two nodes in the linked list
+                if(x > current->row){
+                    current->down = node_ptr;   // push_back_down
+                }
+                else{ // new node is between other 2 nodes
+                    node_prev->down = node_ptr;
+                    node_ptr->down = current;
+                }
             }
-        }
-        if(vec_cols[y] == nullptr){
-            vec_cols[y] = node_ptr;
-            //push_front(&vec_cols[y], &node_ptr);
         }
     }
+
+    /*void print(){
+        for(int i=0; i<rows; ++i){
+            if(vec_rows[i] == nullptr){
+                for(int j=0; j<columns; ++j) cout << "0 ";
+            }
+            else{
+                auto current = vec_rows[i];
+                int j = 0;
+                while(current){
+                    cout << current->data << " ";
+                    current = current->next;
+                    j++;
+                }
+                for(;j<columns;++j){
+                    cout << "0 ";
+                }
+            }
+            cout << '\n';
+        }
+    }*/
 
     void print(){
         for(int i=0; i<rows; ++i){
@@ -91,7 +158,7 @@ public:
                 if(vec_cols[j] == nullptr) cout << "0 ";
                 else{ // run vertically over the list
                     Node<T>* actual = vec_cols[j];
-                    while(actual != nullptr){
+                    while(actual){
                         if(actual->row == i){
                             found = 1;
                             cout << actual->data << " ";
