@@ -49,7 +49,7 @@ public:
         Node<T>* node_prev = nullptr;
         Node<T>* current = nullptr;
         bool done = 0;
-        bool update_operation = 0;
+        //bool update_operation = 0;
         // Update linked list for row x
         if(vec_rows[x] == nullptr){     // if linked list is empty
             node_ptr = new Node<T>(x,y,value);
@@ -63,8 +63,9 @@ public:
                     cout << "update existing node \n";
                     current->data = value;
                     done = 1;
-                    update_operation = 1;
-                    break;
+                    //update_operation = 1;
+                    //break;
+                    return;
                 }
                 else if(y > current->col){
                     node_prev = current;
@@ -90,18 +91,18 @@ public:
                 }
             }
             if(!done){
-                cout << "go to the last position..push_back \n";
+                //cout << "go to the last position..push_back \n";
                 node_ptr = new Node<T>(x,y,value);
                 if(node_prev && y > node_prev->col) node_prev->next = node_ptr;
             }
         }
         // Update Pointers for vertical linked list - column y
-        if(update_operation) return;    // It's Not needed update something
+        //if(update_operation) return;    // It's Not needed update something
         done = 0;
         node_prev = nullptr;
         current = nullptr;
         if(vec_cols[y] == nullptr){  // if head is nullptr
-            cout << "Empty verical list \n";
+            //cout << "Empty verical list \n";
             vec_cols[y] = node_ptr;
         }
         else{  // update existing linked list for column y
@@ -109,22 +110,22 @@ public:
             // Start New Logic
             while(current){
                 if(x > current->row){
-                    cout << "Go down for the next \n";
+                    //cout << "Go down for the next \n";
                     node_prev = current;
                     current = current->down;
                 }
                 else{
                     if(!node_prev){
-                        cout << "before the first and only in that column...node_ptr->data:" << node_ptr->data << " current->data: " << current->data << "\n";
+                        //cout << "before the first and only in that column...node_ptr->data:" << node_ptr->data << " current->data: " << current->data << "\n";
                         node_ptr->down = current;
                         cout << node_ptr->data << "->" << node_ptr->down->data << "\n";
                         vec_cols[y] = node_ptr;     // update head = node_ptr
-                        cout << "head: " << vec_cols[y]->data << "\n";
+                        //cout << "head: " << vec_cols[y]->data << "\n";
                         done = 1;
                         break;
                     }
                     else { // so new node should be between 2 other nodes in that col
-                        cout << "between other 2 nodes in that col \n";
+                        //cout << "between other 2 nodes in that col \n";
                         auto bkp_node_prev_down = node_prev->down;
                         node_prev->down = node_ptr;
                         node_ptr->down = bkp_node_prev_down;
@@ -134,10 +135,41 @@ public:
                 }
             }
             if(!done){
-                cout << "go to the last position..push_back_down \n";
+                //cout << "go to the last position..push_back_down \n";
                 if(node_prev && x > node_prev->row) node_prev->down = node_ptr;
             }
         }
+    }
+
+    T operator()(unsigned x, unsigned y) const{
+        auto current = vec_rows[x];
+        while(current){
+            if(y == current->col){
+                return current->data;
+            }
+            else if(y > current->col){
+                current = current->next;
+            }
+            else{
+                //cout << "Value: No hay valor en esa columna \n";
+                return 0;
+            }
+        }
+        //cout << "Val: No hay mas despues de la ultima columna filled \n";
+        return 0;
+    }
+
+    Matrix<T> operator*(T scalar) const{
+        Matrix<T> result(rows, columns);
+        cout << "Multiplication by scalar \n";
+        //cout << (*this).operator()(0,1) << "\n";
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                auto value = (*this).operator()(i,j);
+                if(value != 0) result.set(i,j,value * scalar);
+            }
+        }
+        return result;
     }
 
     void print(){
@@ -164,13 +196,16 @@ public:
             cout << '\n';
         }
         cout << '\n';
-        cout << "-- Test --\n";
+        /*
+        cout << "-- Start Test --\n";
         auto current = vec_rows[0];
         while(current){
             cout << current->data << " ";
             current = current->next;
         }
         cout << '\n';
+        cout << "-- End Test --\n";
+         */
     }
 
     ~Matrix(){

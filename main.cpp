@@ -17,6 +17,10 @@ int main() {
     matsparsa.print();
     matsparsa.set(2,2,9);
     matsparsa.print();
+    cout << matsparsa(2,3) << '\n';
+    auto mat_result = matsparsa * 3;
+    matsparsa.print();
+    mat_result.print();
     /*
     matsparsa.set(0,0,4);
     matsparsa.print();
