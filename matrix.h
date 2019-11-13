@@ -11,7 +11,7 @@ using namespace std;
 template <typename T>
 class Matrix {
 private:
-    Node<T> *root;
+    //Node<T> *root;
     unsigned rows, columns;
     vector<Node<T>*> vec_cols;
     vector<Node<T>*> vec_rows;
@@ -44,6 +44,30 @@ public:
         }
     }
 
+    Matrix(const Matrix &other) { //Copy constructor
+        cout << "Copy Constructor \n";
+        this->rows = other.rows;
+        this->columns = other.columns;
+
+        // Init
+        vec_rows.reserve(rows);
+        for(int i=0; i<rows; ++i){
+            Node<T>* head = nullptr;
+            vec_rows.push_back(head);
+        }
+        vec_cols.reserve(rows);
+        for(int j=0; j<columns; ++j){
+            Node<T>* head = nullptr;
+            vec_cols.push_back(head);
+        }
+
+        for(int i=0 ; i < this->rows ; ++i) {
+            for(int j=0 ; j < this->columns ; ++j) {
+                set(i, j, other(i, j) );
+            }
+        }
+    }
+
     void set(unsigned x, unsigned y, T value){
         //Node<T>* node_ptr = new Node<T>(x,y,value);
         Node<T>* node_ptr = nullptr;
@@ -60,7 +84,7 @@ public:
             // new logic
             while(current){
                 if(current->col == y){
-                    cout << "update existing node \n";
+                    cout << "xx update existing node xx \n";
                     current->data = value;
                     return;
                 }
@@ -71,14 +95,14 @@ public:
                 else{  // new node should be a column before the current
                     node_ptr = new Node<T>(x,y,value);
                     if(!node_prev){
-                        cout << "before the first and only filled col\n";
+                        //cout << "before the first and only filled col\n";
                         node_ptr->next = current;
                         current = node_ptr;     // update head = node_ptr
                         done = 1;
                         break;
                     }
                     else { // so new node should be between 2 other nodes in that row
-                        cout << "between other 2 nodes \n";
+                        //cout << "between other 2 nodes \n";
                         auto bkp_node_prev_next = node_prev->next;
                         node_prev->next = node_ptr;
                         node_ptr->next = bkp_node_prev_next;
@@ -147,16 +171,30 @@ public:
                 current = current->next;
             }
             else{
-                //cout << "Value: No hay valor en esa columna \n";
+                cout << "x,y " << x << "," << y << " current->row, current->col: " << current->row << "," << current->col << " data: " << current->data << "\n";
+                cout << "**Value: No hay valor en esa columna \n";
                 return 0;
             }
         }
-        //cout << "Val: No hay mas despues de la ultima columna filled \n";
+        cout << "**Val: No hay mas despues de la ultima columna filled \n";
         return 0;
     }
 
+    Matrix<T>& operator=(const Matrix<T> &other){
+        cout << "Copy = operator \n";
+        for(int i=0; i<other.rows; ++i){
+            auto node_ptr = other.vec_rows[i];
+            while(node_ptr){
+                //cout << "set(" << node_ptr->row <<", " << node_ptr->col <<", " << node_ptr->data << ")" << '\n';
+                set(node_ptr->row, node_ptr->col, node_ptr->data);
+                node_ptr = node_ptr->next;
+            }
+        }
+        return (*this);
+    }
+
     Matrix<T> operator*(T scalar) const{    // Multiplication by scalar
-        Matrix<T> result(rows, columns);
+        Matrix<T> result(this->rows, this->columns);
         //cout << (*this).operator()(0,1) << "\n";
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < columns; ++j) {
@@ -165,6 +203,27 @@ public:
             }
         }
         return result;
+    }
+
+    Matrix<T> operator+(Matrix<T> other) const{
+        if(this->rows != other.rows || this->columns != other.columns) {
+            string msg_error = "Matrix are of different dimensions";
+            throw runtime_error(msg_error);
+        }
+        Matrix<T> resultado(this->rows, this->columns);
+        //cout << (*this).operator()(0,1) << "\n";
+        //cout << other.operator()(0,2) << "\n";
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                auto value_m1 = (*this).operator()(i,j);
+                auto value_m2 = other.operator()(i,j);
+                auto res = value_m1 + value_m2;
+                cout << "sum("  << i << "," << j << ") " << value_m1 << "+" << value_m2 << " -> " << res << '\n';
+                resultado.set(i,j,res);
+                cout << "stored: " << resultado(i,j) << '\n';
+            }
+        }
+        return resultado;
     }
 
     void print(){
@@ -191,23 +250,13 @@ public:
             cout << '\n';
         }
         cout << '\n';
-        /*
-        cout << "-- Start Test --\n";
-        auto current = vec_rows[0];
-        while(current){
-            cout << current->data << " ";
-            current = current->next;
-        }
-        cout << '\n';
-        cout << "-- End Test --\n";
-         */
     }
 
     ~Matrix(){
         cout << "Destructor Matrix Sparse" << '\n';
         for(int i=0; i<rows; ++i){
             if(vec_rows[i] != nullptr){
-                //cout << "Kill en fila: " << i << '\n';
+                //cout << "Kill en fila: " << i << " " << vec_rows[i]->data << " " << '\n';
                 vec_rows[i]->killSelf();
             }
         }

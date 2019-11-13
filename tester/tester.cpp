@@ -24,17 +24,20 @@ void Tester::testMatrix(unsigned int rows, unsigned int columns) {
             ASSERT(result(i, j) == matrix1[i][j] * scalar, "There is a problem with the scalar multiplication");
         }
     }
-    cout << "Testing end! \n";
-    /*
+
+
     int **matrix2 = buildMatrix<T>(rows, columns);
     Matrix<T> test2 = setMatrix<T>(matrix2, rows, columns);
+
     result = test1 + test2;
+    result.print();
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < columns; ++j) {
+            cout << "result(" << i << ","<< j << ") : " << result(i,j) << " == " <<  matrix1[i][j] + matrix2[i][j] << " ||| " << test1(i,j) << "+" << test2(i,j) << "|" << matrix1[i][j] << "+" << matrix2[i][j] << '\n';
             ASSERT(result(i, j) == matrix1[i][j] + matrix2[i][j], "There is a problem with the addition");
         }
     }
-
+    /*
     result = test1 - test2;
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < columns; ++j) {
