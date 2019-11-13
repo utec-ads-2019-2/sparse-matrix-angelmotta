@@ -102,7 +102,7 @@ public:
                         break;
                     }
                     else { // so new node should be between 2 other nodes in that row
-                        //cout << "between other 2 nodes \n";
+                        cout << "node_data: " << node_ptr->data << "between other 2 nodes \n";
                         auto bkp_node_prev_next = node_prev->next;
                         node_prev->next = node_ptr;
                         node_ptr->next = bkp_node_prev_next;
@@ -122,7 +122,7 @@ public:
         node_prev = nullptr;
         current = nullptr;
         if(vec_cols[y] == nullptr){  // if head is nullptr
-            //cout << "Empty verical list \n";
+            cout << "Empty verical list \n";
             vec_cols[y] = node_ptr;
         }
         else{  // update existing linked list for column y
@@ -136,7 +136,7 @@ public:
                 }
                 else{
                     if(!node_prev){
-                        //cout << "before the first and only in that column...node_ptr->data:" << node_ptr->data << " current->data: " << current->data << "\n";
+                        cout << "before the first and only in that column...node_ptr->data:" << node_ptr->data << " current->data: " << current->data << "\n";
                         node_ptr->down = current;
                         cout << node_ptr->data << "->" << node_ptr->down->data << "\n";
                         vec_cols[y] = node_ptr;     // update head = node_ptr
@@ -159,6 +159,17 @@ public:
                 if(node_prev && x > node_prev->row) node_prev->down = node_ptr;
             }
         }
+    }
+
+    Matrix <T> transpose() const {
+        Matrix<T> result(this->columns, this->rows);    // invierte las dimensiones de la matriz
+        for(int i =0; i<this->columns; ++i){
+            for(int j=0; j<this->rows; ++j){
+                auto value = this->operator()(j,i);
+                if(value !=0) result.set(i,j,value);  // swap values
+            }
+        }
+        return result;
     }
 
     T operator()(unsigned x, unsigned y) const{
@@ -221,6 +232,27 @@ public:
                 cout << "sum("  << i << "," << j << ") " << value_m1 << "+" << value_m2 << " -> " << res << '\n';
                 resultado.set(i,j,res);
                 cout << "stored: " << resultado(i,j) << '\n';
+            }
+        }
+        return resultado;
+    }
+
+    Matrix<T> operator-(Matrix<T> other) const{
+        if(this->rows != other.rows || this->columns != other.columns) {
+            string msg_error = "Matrix are of different dimensions";
+            throw runtime_error(msg_error);
+        }
+        Matrix<T> resultado(this->rows, this->columns);
+        //cout << (*this).operator()(0,1) << "\n";
+        //cout << other.operator()(0,2) << "\n";
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                auto value_m1 = (*this).operator()(i,j);
+                auto value_m2 = other.operator()(i,j);
+                auto res = value_m1 - value_m2;
+                //cout << "resta("  << i << "," << j << ") " << value_m1 << "+" << value_m2 << " -> " << res << '\n';
+                resultado.set(i,j,res);
+                //cout << "stored: " << resultado(i,j) << '\n';
             }
         }
         return resultado;

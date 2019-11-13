@@ -3,7 +3,18 @@
 #include "matrix.h"
 
 int main() {
-    Tester::execute();
+    //Tester::execute();
+    // Transpose
+    Matrix<int> matsparsa(3,3);
+    matsparsa.set(0,0,1);
+    matsparsa.set(0,1,2);
+    matsparsa.set(0,2,3);
+    matsparsa.set(1,0,4);
+    matsparsa.set(1,1,5);
+    matsparsa.set(1,2,6);
+    matsparsa.print();
+    auto matTranspose = matsparsa.transpose();
+    matTranspose.print();
     /*
     Matrix<int> matsparsa(4,4);
     matsparsa.set(0,0,4);
