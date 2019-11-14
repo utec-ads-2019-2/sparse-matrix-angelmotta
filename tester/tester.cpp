@@ -31,6 +31,7 @@ void Tester::testMatrix(unsigned int rows, unsigned int columns) {
 
     result = test1 + test2;
     result.print();
+    result.print2();
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < columns; ++j) {
             cout << "result(" << i << ","<< j << ") : " << result(i,j) << " == " <<  matrix1[i][j] + matrix2[i][j] << " ||| " << test1(i,j) << "+" << test2(i,j) << "|" << matrix1[i][j] << "+" << matrix2[i][j] << '\n';
@@ -46,7 +47,7 @@ void Tester::testMatrix(unsigned int rows, unsigned int columns) {
             ASSERT(result(i, j) == matrix1[i][j] - matrix2[i][j], "There is a problem with the subtraction");
         }
     }
-     */
+    */
 }
 
 template <typename T>

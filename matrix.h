@@ -63,7 +63,7 @@ public:
 
         for(int i=0 ; i < this->rows ; ++i) {
             for(int j=0 ; j < this->columns ; ++j) {
-                set(i, j, other(i, j) );
+                set(i, j, other.operator()(i, j) );
             }
         }
     }
@@ -76,6 +76,7 @@ public:
         bool done = 0;
         // Update linked list for row x
         if(vec_rows[x] == nullptr){     // if linked list is empty
+            //cout << "Empty horizontal list \n";
             node_ptr = new Node<T>(x,y,value);
             vec_rows[x] = node_ptr;
         }
@@ -84,18 +85,18 @@ public:
             // new logic
             while(current){
                 if(current->col == y){
-                    cout << "xx update existing node xx \n";
+                    //cout << "xx update existing node xx \n";
                     current->data = value;
                     return;
                 }
                 else if(y > current->col){
                     node_prev = current;
-                    current = current->next;    // if next is nullptr insert node after while
+                    current = current->next;    // if next is nullptr done = 0 and do push_back
                 }
                 else{  // new node should be a column before the current
                     node_ptr = new Node<T>(x,y,value);
                     if(!node_prev){
-                        //cout << "before the first and only filled col\n";
+                        cout << "before the first and only filled col\n";
                         node_ptr->next = current;
                         current = node_ptr;     // update head = node_ptr
                         done = 1;
@@ -112,7 +113,7 @@ public:
                 }
             }
             if(!done){
-                //cout << "go to the last position..push_back \n";
+                cout << "go to the last position..push_back \n";
                 node_ptr = new Node<T>(x,y,value);
                 if(node_prev && y > node_prev->col) node_prev->next = node_ptr;
             }
@@ -194,11 +195,8 @@ public:
     Matrix<T>& operator=(const Matrix<T> &other){
         cout << "Copy = operator \n";
         for(int i=0; i<other.rows; ++i){
-            auto node_ptr = other.vec_rows[i];
-            while(node_ptr){
-                //cout << "set(" << node_ptr->row <<", " << node_ptr->col <<", " << node_ptr->data << ")" << '\n';
-                set(node_ptr->row, node_ptr->col, node_ptr->data);
-                node_ptr = node_ptr->next;
+            for(int j=0; j<other.columns; ++j){
+                set(i,j,other.operator()(i,j));
             }
         }
         return (*this);
@@ -211,6 +209,24 @@ public:
             for (int j = 0; j < columns; ++j) {
                 auto value = (*this).operator()(i,j);
                 if(value != 0) result.set(i,j,value * scalar);
+            }
+        }
+        return result;
+    }
+
+    Matrix<T> operator*(Matrix<T> other) const{
+        if(!this->columns == other.rows) {
+            string msg_error = "Rows and columns between two matrix does not match";
+            throw runtime_error(msg_error);
+        }
+        Matrix <T> result(this->rows, other.columns);
+        for (int k = 0; k < other.columns; ++k) {
+            for (int i = 0; i<this->rows; ++i) {
+                auto suma = 0;
+                for (int j = 0; j<this->columns; ++j) {
+                    suma += (this->operator()(i, j) * other.operator()(j, k));
+                }
+                result.set(i, k, suma);
             }
         }
         return result;
@@ -256,6 +272,18 @@ public:
             }
         }
         return resultado;
+    }
+
+    void print2(){
+        for(int i=0;i<rows;++i){
+            auto node_ptr = vec_rows[i];
+            while(node_ptr){
+                cout << node_ptr->data << " ";
+                node_ptr = node_ptr->next;
+            }
+            cout << '\n';
+        }
+        cout << '\n';
     }
 
     void print(){
