@@ -20,6 +20,8 @@ public:
         delete this;
     }
 
+    explicit Node(): next{nullptr}, down{nullptr} {}
+    explicit Node(T value): next{nullptr}, down{nullptr}, data{value} {}
     Node(int x, int y, T value): row{x}, col{y}, data{value}, next{nullptr}, down{nullptr} {}    // Constructor
 
     friend class Matrix<T>;

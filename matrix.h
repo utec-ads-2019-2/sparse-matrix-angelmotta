@@ -11,27 +11,11 @@ using namespace std;
 template <typename T>
 class Matrix {
 private:
-    //Node<T> *root;
     unsigned rows, columns;
     vector<Node<T>*> vec_cols;
     vector<Node<T>*> vec_rows;
 
-public:
-    /*
-    Matrix(unsigned rows, unsigned columns);
-
-    void set(unsigned, unsigned, T);
-    T operator()(unsigned, unsigned) const;
-    Matrix<T> operator*(T scalar) const;
-    Matrix<T> operator*(Matrix<T> other) const;
-    Matrix<T> operator+(Matrix<T> other) const;
-    Matrix<T> operator-(Matrix<T> other) const;
-    Matrix<T> transpose() const;
-    void print() const;
-
-    ~Matrix();
-     */
-    Matrix(unsigned _rows, unsigned _cols) : rows(_rows), columns(_cols) {
+    void initMatrix(){
         vec_rows.reserve(rows);
         for(int i=0; i<rows; ++i){
             Node<T>* head = nullptr;
@@ -44,23 +28,15 @@ public:
         }
     }
 
-    Matrix(const Matrix &other) { //Copy constructor
-        cout << "Copy Constructor \n";
-        this->rows = other.rows;
-        this->columns = other.columns;
+public:
 
+    Matrix(unsigned _rows, unsigned _cols) : rows(_rows), columns(_cols) {
+        initMatrix();
+    }
+
+    Matrix(const Matrix &other) : rows(other.rows), columns(other.columns) { //Copy constructor
         // Init
-        vec_rows.reserve(rows);
-        for(int i=0; i<rows; ++i){
-            Node<T>* head = nullptr;
-            vec_rows.push_back(head);
-        }
-        vec_cols.reserve(rows);
-        for(int j=0; j<columns; ++j){
-            Node<T>* head = nullptr;
-            vec_cols.push_back(head);
-        }
-
+        initMatrix();
         for(int i=0 ; i < this->rows ; ++i) {
             for(int j=0 ; j < this->columns ; ++j) {
                 set(i, j, other.operator()(i, j) );
@@ -174,7 +150,20 @@ public:
     }
 
     T operator()(unsigned x, unsigned y) const{
-        auto current = vec_rows[x];
+        auto current = vec_cols[y];
+        while(current){
+            if(x == current->row){
+                return current->data;
+            }
+            else if(x > current->row){
+                current = current->down;
+            }
+            else{
+                break;
+            }
+        }
+        return 0;
+        /*auto current = vec_rows[x];
         while(current){
             if(y == current->col){
                 return current->data;
@@ -190,6 +179,7 @@ public:
         }
         cout << "**Val: No hay mas despues de la ultima columna filled \n";
         return 0;
+         */
     }
 
     Matrix<T>& operator=(const Matrix<T> &other){
