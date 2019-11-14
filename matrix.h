@@ -44,8 +44,37 @@ public:
         }
     }
 
+    void deleteNode(unsigned x, unsigned y){
+        Node<T>* node_bkp_down = nullptr;
+        Node<T>* node_bkp_next = nullptr;
+        if(vec_cols[y]->row == x){  // si el head apunta al nodo que deseamos eliminar
+            // Delete for Y
+            node_bkp_down = vec_cols[y]->down;
+            delete vec_cols[y];
+            vec_cols[y] = node_bkp_down;
+            // Delete for X
+            return;
+        }
+        auto current = vec_cols[y];
+        while(current->down && current->down->row < x){
+            current = current->down;
+        }
+
+        if(current->down && current->down->data == x){
+            auto node_bkp_down = current->down->down;
+            delete current->down;
+            current->down = node_bkp_down;
+        }
+        else return;
+        // Horizontalmente
+    }
+
     void set(unsigned x, unsigned y, T value){
         //Node<T>* node_ptr = new Node<T>(x,y,value);
+        /*if(value == 0){
+            deleteNode(x,y);
+            return;
+        }*/
         Node<T>* node_ptr = nullptr;
         Node<T>* node_prev = nullptr;
         Node<T>* current = nullptr;
@@ -72,14 +101,14 @@ public:
                 else{  // new node should be a column before the current
                     node_ptr = new Node<T>(x,y,value);
                     if(!node_prev){
-                        cout << "before the first and only filled col\n";
+                        //cout << "before the first and only filled col\n";
                         node_ptr->next = current;
                         current = node_ptr;     // update head = node_ptr
                         done = 1;
                         break;
                     }
                     else { // so new node should be between 2 other nodes in that row
-                        cout << "node_data: " << node_ptr->data << "between other 2 nodes \n";
+                        //cout << "node_data: " << node_ptr->data << "between other 2 nodes \n";
                         auto bkp_node_prev_next = node_prev->next;
                         node_prev->next = node_ptr;
                         node_ptr->next = bkp_node_prev_next;
@@ -89,7 +118,7 @@ public:
                 }
             }
             if(!done){
-                cout << "go to the last position..push_back \n";
+                //cout << "go to the last position..push_back \n";
                 node_ptr = new Node<T>(x,y,value);
                 if(node_prev && y > node_prev->col) node_prev->next = node_ptr;
             }
@@ -99,7 +128,7 @@ public:
         node_prev = nullptr;
         current = nullptr;
         if(vec_cols[y] == nullptr){  // if head is nullptr
-            cout << "Empty verical list \n";
+            //cout << "Empty verical list \n";
             vec_cols[y] = node_ptr;
         }
         else{  // update existing linked list for column y
@@ -113,9 +142,9 @@ public:
                 }
                 else{
                     if(!node_prev){
-                        cout << "before the first and only in that column...node_ptr->data:" << node_ptr->data << " current->data: " << current->data << "\n";
+                        //cout << "before the first and only in that column...node_ptr->data:" << node_ptr->data << " current->data: " << current->data << "\n";
                         node_ptr->down = current;
-                        cout << node_ptr->data << "->" << node_ptr->down->data << "\n";
+                        //cout << node_ptr->data << "->" << node_ptr->down->data << "\n";
                         vec_cols[y] = node_ptr;     // update head = node_ptr
                         //cout << "head: " << vec_cols[y]->data << "\n";
                         done = 1;
@@ -163,27 +192,9 @@ public:
             }
         }
         return 0;
-        /*auto current = vec_rows[x];
-        while(current){
-            if(y == current->col){
-                return current->data;
-            }
-            else if(y > current->col){
-                current = current->next;
-            }
-            else{
-                cout << "x,y " << x << "," << y << " current->row, current->col: " << current->row << "," << current->col << " data: " << current->data << "\n";
-                cout << "**Value: No hay valor en esa columna \n";
-                return 0;
-            }
-        }
-        cout << "**Val: No hay mas despues de la ultima columna filled \n";
-        return 0;
-         */
     }
 
     Matrix<T>& operator=(const Matrix<T> &other){
-        cout << "Copy = operator \n";
         for(int i=0; i<other.rows; ++i){
             for(int j=0; j<other.columns; ++j){
                 set(i,j,other.operator()(i,j));
@@ -235,9 +246,9 @@ public:
                 auto value_m1 = (*this).operator()(i,j);
                 auto value_m2 = other.operator()(i,j);
                 auto res = value_m1 + value_m2;
-                cout << "sum("  << i << "," << j << ") " << value_m1 << "+" << value_m2 << " -> " << res << '\n';
+                //cout << "sum("  << i << "," << j << ") " << value_m1 << "+" << value_m2 << " -> " << res << '\n';
                 resultado.set(i,j,res);
-                cout << "stored: " << resultado(i,j) << '\n';
+                //cout << "stored: " << resultado(i,j) << '\n';
             }
         }
         return resultado;
@@ -303,7 +314,7 @@ public:
     }
 
     ~Matrix(){
-        cout << "Destructor Matrix Sparse" << '\n';
+        //cout << "Destructor Matrix Sparse" << '\n';
         for(int i=0; i<rows; ++i){
             if(vec_rows[i] != nullptr){
                 //cout << "Kill en fila: " << i << " " << vec_rows[i]->data << " " << '\n';
