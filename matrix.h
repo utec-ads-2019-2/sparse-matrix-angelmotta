@@ -70,6 +70,9 @@ public:
     }
 
     void set(unsigned x, unsigned y, T value){
+        // Aquí no deberías eliminar en caso de ser 0? 
+        // Hay bastante código que se podría simplificar en el set
+
         //Node<T>* node_ptr = new Node<T>(x,y,value);
         /*if(value == 0){
             deleteNode(x,y);
@@ -202,6 +205,8 @@ public:
         }
         return (*this);
     }
+
+    // Hubiera sido mejor trabajar con los punteros en vez de los métodos, ya que afecta el performance
 
     Matrix<T> operator*(T scalar) const{    // Multiplication by scalar
         Matrix<T> result(this->rows, this->columns);
